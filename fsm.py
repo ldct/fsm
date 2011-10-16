@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
-import sys, os
+import sys, os, thread, time
 import pygtk, gtk, gobject
+import gtk.glade
 import pygst
 pygst.require("0.10")
 import gst
@@ -25,18 +26,19 @@ class GTK_Main:
         rewind_button = gtk.Button("Rewind")
         rewind_button.connect("clicked", self.rewind_callback)
         buttonbox.add(rewind_button)
-        
-        time_button = gtk.Button("Time")
-        time_button.connect("clicked", self.time_callback)
-        buttonbox.add(time_button)
-        
+                
         self.button = gtk.Button("Start")
-        self.button.connect("clicked", self.start_stop)
+        self.button.connect("clicked", self.start_pause)
         buttonbox.add(self.button)
         
         forward_button = gtk.Button("Forward")
         forward_button.connect("clicked", self.forward_callback)
         buttonbox.add(forward_button)
+        
+        playback_scale = gtk.HScale()
+        #forward_button.connect("clicked", self.forward_callback)
+        buttonbox.add(playback_scale)
+
         
         self.time_label = gtk.Label()
         self.time_label.set_text("00:00 / 00:00")
@@ -51,15 +53,17 @@ class GTK_Main:
         
     #/home/xuanji/Music/Symphony X Complete Discography @ 320 kbps/Symphony X - 2007 - Paradise Lost/05. Paradise Lost.mp3
 
-    def start_stop(self, w):
+    def start_pause(self, w):
         if self.button.get_label() == "Start":
             filepath = self.entry.get_text()
             if os.path.isfile(filepath):
-                self.button.set_label("Stop")
+                self.button.set_label("Pause")
                 self.player.set_property("uri", "file://" + filepath)
                 self.player.set_state(gst.STATE_PLAYING)
+                thread.start_new_thread(self.time_callback, ())
+                
         else:
-            self.player.set_state(gst.STATE_NULL)
+            self.player.set_state(gst.STATE_PAUSED)
             self.button.set_label("Start")
 
             
@@ -73,9 +77,28 @@ class GTK_Main:
         seek_ns = pos_int + (10 * 1000000000)
         self.player.seek_simple(gst.FORMAT_TIME, gst.SEEK_FLAG_FLUSH, seek_ns)
         
-    def time_callback(self, w):
-        pos_int = self.player.query_position(gst.FORMAT_TIME, None)[0]
-        print pos_int
+    def time_callback(self):
+    
+    	def convert_ns(t):
+		    s,ns = divmod(t, 1000000000)
+		    m,s = divmod(s, 60)
+
+		    if m < 60:
+			    return "%02i:%02i" %(m,s)
+		    else:
+			    h,m = divmod(m, 60)
+			    return "%i:%02i:%02i" %(h,m,s)
+    
+        while True:
+            
+            time.sleep(0.2)
+            
+            pos_int = self.player.query_position(gst.FORMAT_TIME, None)[0]
+            dur_int = self.player.query_duration(gst.FORMAT_TIME, None)[0]
+            
+            gtk.gdk.threads_enter()
+            self.time_label.set_text(convert_ns(pos_int) + " / " + convert_ns(dur_int))
+            gtk.gdk.threads_leave()
                         
     def on_message(self, bus, message):
         t = message.type
