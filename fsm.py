@@ -10,41 +10,13 @@ import gst
 class GTK_Main:
     
     def __init__(self):
-        window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-        window.set_title("Audio-Player")
-        window.set_default_size(500, -1)
-        window.connect("destroy", gtk.main_quit, "WM destroy")
-        vbox = gtk.VBox()
-        window.add(vbox)
-        self.entry = gtk.Entry()
-        vbox.pack_start(self.entry, False)
-        hbox = gtk.HBox()
-        vbox.add(hbox)
-        buttonbox = gtk.HButtonBox()
-        hbox.pack_start(buttonbox, False)
         
-        rewind_button = gtk.Button("Rewind")
-        rewind_button.connect("clicked", self.rewind_callback)
-        buttonbox.add(rewind_button)
+        filename = "main.glade"
+        self.builder = gtk.Builder()
+        self.builder.add_from_file(filename)
+        self.builder.connect_signals(self)
                 
-        self.button = gtk.Button("Start")
-        self.button.connect("clicked", self.start_pause)
-        buttonbox.add(self.button)
-        
-        forward_button = gtk.Button("Forward")
-        forward_button.connect("clicked", self.forward_callback)
-        buttonbox.add(forward_button)
-        
-        playback_scale = gtk.HScale()
-        #forward_button.connect("clicked", self.forward_callback)
-        buttonbox.add(playback_scale)
-
-        
-        self.time_label = gtk.Label()
-        self.time_label.set_text("00:00 / 00:00")
-        hbox.add(self.time_label)
-        
-        window.show_all()
+        self.builder.get_object("window1").show()
         
         self.player = gst.element_factory_make("playbin2", "player")
         bus = self.player.get_bus()
@@ -53,11 +25,10 @@ class GTK_Main:
         
     #/home/xuanji/Music/Symphony X Complete Discography @ 320 kbps/Symphony X - 2007 - Paradise Lost/05. Paradise Lost.mp3
 
-    def start_pause(self, w):
-        if self.button.get_label() == "Start":
-            filepath = self.entry.get_text()
+    def play_pause(self, w):
+        if w.toggled:
+            filepath = self.builder.get_object("entry").get_text()
             if os.path.isfile(filepath):
-                self.button.set_label("Pause")
                 self.player.set_property("uri", "file://" + filepath)
                 self.player.set_state(gst.STATE_PLAYING)
                 thread.start_new_thread(self.time_callback, ())
@@ -97,7 +68,7 @@ class GTK_Main:
             dur_int = self.player.query_duration(gst.FORMAT_TIME, None)[0]
             
             gtk.gdk.threads_enter()
-            self.time_label.set_text(convert_ns(pos_int) + " / " + convert_ns(dur_int))
+            self.builder.get_object("time_label").set_text(convert_ns(pos_int) + " / " + convert_ns(dur_int))
             gtk.gdk.threads_leave()
                         
     def on_message(self, bus, message):
@@ -111,6 +82,6 @@ class GTK_Main:
             print "Error: %s" % err, debug
             self.button.set_label("Start")
 
-GTK_Main()
+app = GTK_Main()
 gtk.gdk.threads_init()
 gtk.main()
