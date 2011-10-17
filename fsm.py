@@ -72,8 +72,11 @@ class GTK_Main:
             
             time.sleep(0.05)
             
-            pos_int = self.player.query_position(gst.FORMAT_TIME, None)[0]
-            dur_int = self.player.query_duration(gst.FORMAT_TIME, None)[0]
+            try:
+                pos_int = self.player.query_position(gst.FORMAT_TIME, None)[0]
+                dur_int = self.player.query_duration(gst.FORMAT_TIME, None)[0]
+            except gst.QueryError:
+                continue
             
             gtk.gdk.threads_enter()
             self.builder.get_object("time_label").set_text(convert_ns(pos_int) + " / " + convert_ns(dur_int))
