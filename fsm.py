@@ -16,16 +16,35 @@ class GTK_Main:
         self.builder.add_from_file(filename)
         self.builder.connect_signals(self)
                 
-        self.builder.get_object("window1").show()
+        self.builder.get_object("fsm-audioplayer").show()
         
         self.player = gst.element_factory_make("playbin2", "player")
         bus = self.player.get_bus()
         bus.add_signal_watch()
         bus.connect("message", self.on_message)
         
+        self.builder.get_object("album-view").set_text_column(0)
+        self.builder.get_object("album-view").set_pixbuf_column(1)
+
+        self.fill_store()
+
         self.respond_to_slider = True
         
     #/home/xuanji/Music/Symphony X Complete Discography @ 320 kbps/Symphony X - 2007 - Paradise Lost/05. Paradise Lost.mp3
+
+    def get_icon(self, name):
+        theme = gtk.icon_theme_get_default()
+        return theme.load_icon(name, 48, 0)
+        
+    def fill_store(self):
+        self.builder.get_object("album-store").clear()
+        for fl in os.listdir("/home/xuanji"):
+            if not fl[0] == '.': 
+                print "hi"
+                if os.path.isdir(os.path.join("/home/xuanji", fl)):
+                    self.builder.get_object("album-store").append(["hi", self.get_icon(gtk.STOCK_FILE)])
+                else:
+                    self.builder.get_object("album-store").append(["hi", self.get_icon(gtk.STOCK_DIRECTORY)])  
 
     def play_pause(self, w):
         if w.get_active():
@@ -79,9 +98,9 @@ class GTK_Main:
                 continue
             
             gtk.gdk.threads_enter()
-            self.builder.get_object("time_label").set_text(convert_ns(pos_int) + " / " + convert_ns(dur_int))
+            self.builder.get_object("time-label").set_text(convert_ns(pos_int) + " / " + convert_ns(dur_int))
             self.respond_to_slider = False
-            self.builder.get_object("playback_adjustment").set_value((float(pos_int) / float(dur_int)) * 100.)
+            self.builder.get_object("playback-adjustment").set_value((float(pos_int) / float(dur_int)) * 100.)
             self.respond_to_slider = True
             gtk.gdk.threads_leave()
                         

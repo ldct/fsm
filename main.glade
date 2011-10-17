@@ -2,25 +2,39 @@
 <interface>
   <requires lib="gtk+" version="2.24"/>
   <!-- interface-naming-policy project-wide -->
-  <object class="GtkListStore" id="liststore1"/>
-  <object class="GtkAdjustment" id="playback_adjustment">
-    <property name="upper">100</property>
-    <property name="step_increment">1</property>
-    <property name="page_increment">10</property>
+  <object class="GtkListStore" id="album-store">
+    <columns>
+      <!-- column-name gchararray1 -->
+      <column type="gchararray"/>
+      <!-- column-name GdkPixbuf1 -->
+      <column type="GdkPixbuf"/>
+    </columns>
   </object>
-  <object class="GtkWindow" id="window1">
+  <object class="GtkWindow" id="fsm-audioplayer">
     <property name="can_focus">False</property>
     <property name="default_width">600</property>
     <property name="default_height">400</property>
     <child>
-      <object class="GtkVBox" id="vbox1">
+      <object class="GtkVBox" id="vbox">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <child>
-          <object class="GtkIconView" id="iconview1">
+          <object class="GtkScrolledWindow" id="album-scroll">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
-            <property name="model">liststore1</property>
+            <property name="hscrollbar_policy">automatic</property>
+            <property name="vscrollbar_policy">automatic</property>
+            <child>
+              <object class="GtkIconView" id="album-view">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="model">album-store</property>
+                <property name="row_spacing">0</property>
+                <property name="column_spacing">0</property>
+                <property name="margin">0</property>
+                <property name="item_padding">0</property>
+              </object>
+            </child>
           </object>
           <packing>
             <property name="expand">True</property>
@@ -29,7 +43,7 @@
           </packing>
         </child>
         <child>
-          <object class="GtkVBox" id="vbox2">
+          <object class="GtkVBox" id="playback">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
@@ -50,15 +64,15 @@
               </packing>
             </child>
             <child>
-              <object class="GtkHBox" id="hbox2">
+              <object class="GtkHBox" id="playback-bar">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <object class="GtkHScale" id="playback_scales">
+                  <object class="GtkHScale" id="playback-scales">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="update_policy">discontinuous</property>
-                    <property name="adjustment">playback_adjustment</property>
+                    <property name="adjustment">playback-adjustment</property>
                     <property name="digits">-1</property>
                     <property name="draw_value">False</property>
                     <signal name="value-changed" handler="playback_callback" swapped="no"/>
@@ -70,7 +84,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkLabel" id="time_label">
+                  <object class="GtkLabel" id="time-label">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">00 : / 00</property>
@@ -90,7 +104,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkHBox" id="hbox1">
+              <object class="GtkHBox" id="playback-controls">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
@@ -154,5 +168,10 @@
         </child>
       </object>
     </child>
+  </object>
+  <object class="GtkAdjustment" id="playback-adjustment">
+    <property name="upper">100</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
   </object>
 </interface>
