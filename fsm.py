@@ -23,10 +23,12 @@ class GTK_Main:
         bus.add_signal_watch()
         bus.connect("message", self.on_message)
         
+        self.respond_to_slider = True
+        
     #/home/xuanji/Music/Symphony X Complete Discography @ 320 kbps/Symphony X - 2007 - Paradise Lost/05. Paradise Lost.mp3
 
     def play_pause(self, w):
-        if w.toggled:
+        if w.get_active():
             filepath = self.builder.get_object("entry").get_text()
             if os.path.isfile(filepath):
                 self.player.set_property("uri", "file://" + filepath)
@@ -35,11 +37,11 @@ class GTK_Main:
                 
         else:
             self.player.set_state(gst.STATE_PAUSED)
-            self.button.set_label("Start")
 
             
     def rewind_callback(self, w):
         pos_int = self.player.query_position(gst.FORMAT_TIME, None)[0]
+        dur_int = self.player.query_duration(gst.FORMAT_TIME, None)[0]
         seek_ns = pos_int - (10 * 1000000000)
         self.player.seek_simple(gst.FORMAT_TIME, gst.SEEK_FLAG_FLUSH, seek_ns)
         
@@ -47,6 +49,12 @@ class GTK_Main:
         pos_int = self.player.query_position(gst.FORMAT_TIME, None)[0]
         seek_ns = pos_int + (10 * 1000000000)
         self.player.seek_simple(gst.FORMAT_TIME, gst.SEEK_FLAG_FLUSH, seek_ns)
+          
+    def playback_callback(self, w):
+        if self.respond_to_slider:
+            dur_int = self.player.query_duration(gst.FORMAT_TIME, None)[0]
+            new_pos = dur_int * w.get_value() / 100.
+            self.player.seek_simple(gst.FORMAT_TIME, gst.SEEK_FLAG_FLUSH, new_pos)
         
     def time_callback(self):
     
@@ -62,13 +70,16 @@ class GTK_Main:
     
         while True:
             
-            time.sleep(0.2)
+            time.sleep(0.05)
             
             pos_int = self.player.query_position(gst.FORMAT_TIME, None)[0]
             dur_int = self.player.query_duration(gst.FORMAT_TIME, None)[0]
             
             gtk.gdk.threads_enter()
             self.builder.get_object("time_label").set_text(convert_ns(pos_int) + " / " + convert_ns(dur_int))
+            self.respond_to_slider = False
+            self.builder.get_object("playback_adjustment").set_value((float(pos_int) / float(dur_int)) * 100.)
+            self.respond_to_slider = True
             gtk.gdk.threads_leave()
                         
     def on_message(self, bus, message):
