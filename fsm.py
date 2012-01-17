@@ -26,6 +26,8 @@ class GTK_Main:
         self.builder.get_object("album-view").set_text_column(0)
         self.builder.get_object("album-view").set_pixbuf_column(1)
 
+        self.an_image = gtk.gdk.pixbuf_new_from_file("/home/xuanji/fsm/20.jpg").scale_simple(120,120,gtk.gdk.INTERP_BILINEAR)
+        self.bn_image = gtk.gdk.pixbuf_new_from_file("/home/xuanji/fsm/Octavarium.jpg").scale_simple(120,120,gtk.gdk.INTERP_BILINEAR)
         self.fill_store()
 
         self.respond_to_slider = True
@@ -40,11 +42,10 @@ class GTK_Main:
         self.builder.get_object("album-store").clear()
         for fl in os.listdir("/home/xuanji"):
             if not fl[0] == '.': 
-                print "hi"
                 if os.path.isdir(os.path.join("/home/xuanji", fl)):
-                    self.builder.get_object("album-store").append(["hi", self.get_icon(gtk.STOCK_FILE)])
+                    self.builder.get_object("album-store").append(["hi",self.bn_image])
                 else:
-                    self.builder.get_object("album-store").append(["hi", self.get_icon(gtk.STOCK_DIRECTORY)])  
+                    self.builder.get_object("album-store").append(["hi",self.an_image])
 
     def play_pause(self, w):
         if w.get_active():
