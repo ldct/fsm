@@ -171,7 +171,7 @@
           </packing>
         </child>
         <child>
-          <object class="GtkTreeView" id="songs-view">
+          <object class="GtkTreeView" id="song-view">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="model">songs-store</property>

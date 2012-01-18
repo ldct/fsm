@@ -31,6 +31,8 @@ class GTK_Main:
         
         self.builder.get_object("album-view").set_text_column(0)
         self.builder.get_object("album-view").set_pixbuf_column(1)
+        
+        #self.builder.get_object("song-view").set_text_column(1)
 
         self.an_image = gtk.gdk.pixbuf_new_from_file("/home/xuanji/fsm/20.jpg").scale_simple(120,120,gtk.gdk.INTERP_BILINEAR)
         self.bn_image = gtk.gdk.pixbuf_new_from_file("/home/xuanji/fsm/Octavarium.jpg").scale_simple(120,120,gtk.gdk.INTERP_BILINEAR)
