@@ -7,6 +7,12 @@ import pygst
 pygst.require("0.10")
 import gst
 
+def cut(s, l):
+    if len(s) < l:
+        return s
+    else:
+        return s[0:l] + '\n' + cut(s[l:], l)
+
 class GTK_Main:
     
     def __init__(self):
@@ -30,7 +36,7 @@ class GTK_Main:
         self.bn_image = gtk.gdk.pixbuf_new_from_file("/home/xuanji/fsm/Octavarium.jpg").scale_simple(120,120,gtk.gdk.INTERP_BILINEAR)
         self.fill_store()
 
-        self.respond_to_slider = True
+        self.respond_to_slider = False
         
     #/home/xuanji/Music/Symphony X Complete Discography @ 320 kbps/Symphony X - 2007 - Paradise Lost/05. Paradise Lost.mp3
 
@@ -40,12 +46,13 @@ class GTK_Main:
         
     def fill_store(self):
         self.builder.get_object("album-store").clear()
-        for fl in os.listdir("/home/xuanji"):
+        for fl in os.listdir("/home/xuanji/Music"):
+            self.builder.get_object("songs-store").append(['hello'])
             if not fl[0] == '.': 
-                if os.path.isdir(os.path.join("/home/xuanji", fl)):
-                    self.builder.get_object("album-store").append(["hi",self.bn_image])
+                if os.path.isdir(os.path.join("/home/xuanji/Music", fl)):
+                    self.builder.get_object("album-store").append([cut(fl,10),self.bn_image, os.path.join("/home/xuanji/Music", fl)])
                 else:
-                    self.builder.get_object("album-store").append(["hi",self.an_image])
+                    self.builder.get_object("album-store").append([cut(fl,10),self.an_image, os.path.join("/home/xuanji/Music", fl)])
 
     def play_pause(self, w):
         if w.get_active():
@@ -66,10 +73,16 @@ class GTK_Main:
         self.player.seek_simple(gst.FORMAT_TIME, gst.SEEK_FLAG_FLUSH, seek_ns)
         
     def forward_callback(self, w):
+        print "forward"
         pos_int = self.player.query_position(gst.FORMAT_TIME, None)[0]
         seek_ns = pos_int + (10 * 1000000000)
         self.player.seek_simple(gst.FORMAT_TIME, gst.SEEK_FLAG_FLUSH, seek_ns)
-          
+        
+    def album_view_item_activated_callback(self, w, path):
+        i = self.builder.get_object("album-store").get_iter(path)
+        s = self.builder.get_object("album-store").get(i,2)[0]
+        self.builder.get_object("entry").set_text(s)
+        
     def playback_callback(self, w):
         if self.respond_to_slider:
             dur_int = self.player.query_duration(gst.FORMAT_TIME, None)[0]
@@ -78,19 +91,19 @@ class GTK_Main:
         
     def time_callback(self):
     
-    	def convert_ns(t):
-		    s,ns = divmod(t, 1000000000)
-		    m,s = divmod(s, 60)
+        def convert_ns(t):
+            s,ns = divmod(t, 1000000000)
+            m,s = divmod(s, 60)
 
-		    if m < 60:
-			    return "%02i:%02i" %(m,s)
-		    else:
-			    h,m = divmod(m, 60)
-			    return "%i:%02i:%02i" %(h,m,s)
+            if m < 60:
+                return "%02i:%02i" %(m,s)
+            else:
+                h,m = divmod(m, 60)
+                return "%i:%02i:%02i" %(h,m,s)
     
         while True:
-            
-            time.sleep(0.05)
+        
+            time.sleep(0.2)
             
             try:
                 pos_int = self.player.query_position(gst.FORMAT_TIME, None)[0]
