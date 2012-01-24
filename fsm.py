@@ -8,6 +8,7 @@ pygst.require("0.10")
 import gst
 
 def cut(s, l):
+    return s[0:l]
     if len(s) < l:
         return s
     else:
@@ -39,6 +40,9 @@ class GTK_Main:
         self.fill_store()
 
         self.respond_to_slider = False
+
+        col = gtk.TreeViewColumn("Name", gtk.CellRendererText(), text=0)
+        self.builder.get_object("song-view").append_column(col)
         
     #/home/xuanji/Music/Symphony X Complete Discography @ 320 kbps/Symphony X - 2007 - Paradise Lost/05. Paradise Lost.mp3
 
@@ -49,7 +53,7 @@ class GTK_Main:
     def fill_store(self):
         self.builder.get_object("album-store").clear()
         for fl in os.listdir("/home/xuanji/Music"):
-            self.builder.get_object("songs-store").append(['hello'])
+            self.builder.get_object("songs-store").append([fl])
             if not fl[0] == '.': 
                 if os.path.isdir(os.path.join("/home/xuanji/Music", fl)):
                     self.builder.get_object("album-store").append([cut(fl,10),self.bn_image, os.path.join("/home/xuanji/Music", fl)])

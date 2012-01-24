@@ -171,10 +171,19 @@
           </packing>
         </child>
         <child>
-          <object class="GtkTreeView" id="song-view">
+          <object class="GtkScrolledWindow" id="song-scroll">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
-            <property name="model">songs-store</property>
+            <property name="hscrollbar_policy">automatic</property>
+            <property name="vscrollbar_policy">automatic</property>
+            <child>
+              <object class="GtkTreeView" id="song-view">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="model">songs-store</property>
+                <property name="search_column">0</property>
+              </object>
+            </child>
           </object>
           <packing>
             <property name="expand">True</property>
