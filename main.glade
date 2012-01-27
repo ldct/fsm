@@ -182,6 +182,7 @@
                 <property name="can_focus">True</property>
                 <property name="model">songs-store</property>
                 <property name="search_column">0</property>
+                <signal name="row-activated" handler="song_view_row_activated_callback" swapped="no"/>
               </object>
             </child>
           </object>

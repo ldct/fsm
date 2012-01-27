@@ -7,6 +7,13 @@ import pygst
 pygst.require("0.10")
 import gst
 
+def list_files(d):
+
+    for root, dirs, files in os.walk(d):
+       for name in files:       
+           filename = os.path.join(root, name)
+           yield filename
+
 def cut(s, l):
     return s[0:l]
     if len(s) < l:
@@ -32,8 +39,6 @@ class GTK_Main:
         
         self.builder.get_object("album-view").set_text_column(0)
         self.builder.get_object("album-view").set_pixbuf_column(1)
-        
-        #self.builder.get_object("song-view").set_text_column(1)
 
         self.an_image = gtk.gdk.pixbuf_new_from_file("/home/xuanji/fsm/20.jpg").scale_simple(120,120,gtk.gdk.INTERP_BILINEAR)
         self.bn_image = gtk.gdk.pixbuf_new_from_file("/home/xuanji/fsm/Octavarium.jpg").scale_simple(120,120,gtk.gdk.INTERP_BILINEAR)
@@ -87,6 +92,16 @@ class GTK_Main:
     def album_view_item_activated_callback(self, w, path):
         i = self.builder.get_object("album-store").get_iter(path)
         s = self.builder.get_object("album-store").get(i,2)[0]
+        self.builder.get_object("entry").set_text(s)
+        
+        self.builder.get_object("songs-store").clear()
+        for f in list_files(s):
+            self.builder.get_object("songs-store").append([f])
+            
+    def song_view_row_activated_callback(self, treeview, path, view_column):
+    
+        i = self.builder.get_object("songs-store").get_iter(path)
+        s = self.builder.get_object("songs-store").get(i,0)[0]
         self.builder.get_object("entry").set_text(s)
         
     def playback_callback(self, w):
