@@ -8,7 +8,6 @@ pygst.require("0.10")
 import gst
 
 def list_files(d):
-
     for root, dirs, files in os.walk(d):
        for name in files:       
            filename = os.path.join(root, name)
@@ -48,8 +47,6 @@ class GTK_Main:
 
         col = gtk.TreeViewColumn("Name", gtk.CellRendererText(), text=0)
         self.builder.get_object("song-view").append_column(col)
-        
-    #/home/xuanji/Music/Symphony X Complete Discography @ 320 kbps/Symphony X - 2007 - Paradise Lost/05. Paradise Lost.mp3
 
     def get_icon(self, name):
         theme = gtk.icon_theme_get_default()
@@ -65,14 +62,16 @@ class GTK_Main:
                 else:
                     self.builder.get_object("album-store").append([cut(fl,10),self.an_image, os.path.join("/home/xuanji/Music", fl)])
 
+    def load_new_file(self, filepath):
+        if os.path.isfile(filepath):
+            self.player.set_state(gst.STATE_READY)
+            self.player.set_property("uri", "file://" + filepath)
+            self.player.set_state(gst.STATE_PLAYING)  
+            thread.start_new_thread(self.time_callback, ())
+
     def play_pause(self, w):
         if w.get_active():
-            filepath = self.builder.get_object("entry").get_text()
-            if os.path.isfile(filepath):
-                self.player.set_property("uri", "file://" + filepath)
-                self.player.set_state(gst.STATE_PLAYING)
-                thread.start_new_thread(self.time_callback, ())
-                
+            self.player.set_state(gst.STATE_PLAYING)
         else:
             self.player.set_state(gst.STATE_PAUSED)
 
@@ -103,6 +102,10 @@ class GTK_Main:
         i = self.builder.get_object("songs-store").get_iter(path)
         s = self.builder.get_object("songs-store").get(i,0)[0]
         self.builder.get_object("entry").set_text(s)
+
+        self.load_new_file(s)
+        self.builder.get_object("play_pause_toggle").set_active(True)
+
         
     def playback_callback(self, w):
         if self.respond_to_slider:
@@ -143,12 +146,12 @@ class GTK_Main:
         t = message.type
         if t == gst.MESSAGE_EOS:
             self.player.set_state(gst.STATE_NULL)
-            self.button.set_label("Start")
+            self.builder.get_object("play_pause_toggle").set_label("Start")
         elif t == gst.MESSAGE_ERROR:
             self.player.set_state(gst.STATE_NULL)
             err, debug = message.parse_error()
             print "Error: %s" % err, debug
-            self.button.set_label("Start")
+            self.builder.get_object("play_pause_toggle").set_label("Start")
 
 app = GTK_Main()
 gtk.gdk.threads_init()
