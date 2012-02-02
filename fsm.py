@@ -19,17 +19,26 @@ def cut(s, l):
         return s
     else:
         return s[0:l] + '\n' + cut(s[l:], l)
+        
+def convert_ns(t):
+    s,ns = divmod(t, 1000000000)
+    m,s = divmod(s, 60)
+
+    if m < 60:
+        return "%02i:%02i" %(m,s)
+    else:
+        h,m = divmod(m, 60)
+        return "%i:%02i:%02i" %(h,m,s)
 
 class GTK_Main:
+
+    music_directory = "/home/xuanji/Music"
+    builder = gtk.Builder()
     
     def __init__(self):
         
-        filename = "main.glade"
-        self.builder = gtk.Builder()
-        self.builder.add_from_file(filename)
+        self.builder.add_from_file("main.glade")
         self.builder.connect_signals(self)
-                
-        self.builder.get_object("fsm-audioplayer").show()
         
         self.player = gst.element_factory_make("playbin2", "player")
         bus = self.player.get_bus()
@@ -47,6 +56,10 @@ class GTK_Main:
 
         col = gtk.TreeViewColumn("Name", gtk.CellRendererText(), text=0)
         self.builder.get_object("song-view").append_column(col)
+        
+        thread.start_new_thread(self.time_cron, ())
+        
+        self.builder.get_object("fsm-audioplayer").show()
 
     def get_icon(self, name):
         theme = gtk.icon_theme_get_default()
@@ -54,7 +67,7 @@ class GTK_Main:
         
     def fill_store(self):
         self.builder.get_object("album-store").clear()
-        for fl in os.listdir("/home/xuanji/Music"):
+        for fl in os.listdir(self.music_directory):
             self.builder.get_object("songs-store").append([fl])
             if not fl[0] == '.': 
                 if os.path.isdir(os.path.join("/home/xuanji/Music", fl)):
@@ -67,13 +80,13 @@ class GTK_Main:
             self.player.set_state(gst.STATE_READY)
             self.player.set_property("uri", "file://" + filepath)
             self.player.set_state(gst.STATE_PLAYING)  
-            thread.start_new_thread(self.time_callback, ())
 
     def play_pause(self, w):
         if w.get_active():
             self.player.set_state(gst.STATE_PLAYING)
         else:
             self.player.set_state(gst.STATE_PAUSED)
+        self.update_time()
 
             
     def rewind_callback(self, w):
@@ -113,34 +126,33 @@ class GTK_Main:
             new_pos = dur_int * w.get_value() / 100.
             self.player.seek_simple(gst.FORMAT_TIME, gst.SEEK_FLAG_FLUSH, new_pos)
         
-    def time_callback(self):
+    def update_time(self):
+        try:
+            pos_int = self.player.query_position(gst.FORMAT_TIME, None)[0]
+            dur_int = self.player.query_duration(gst.FORMAT_TIME, None)[0]
+        except gst.QueryError:
+            return
+        
+        gtk.gdk.threads_enter()
+        self.builder.get_object("time-label").set_text(convert_ns(pos_int) + " / " + convert_ns(dur_int))
+        self.respond_to_slider = False
+        self.builder.get_object("playback-adjustment").set_value((float(pos_int) / float(dur_int)) * 100.)
+        self.respond_to_slider = True
+        gtk.gdk.threads_leave()
+        
+    def time_cron(self):
     
-        def convert_ns(t):
-            s,ns = divmod(t, 1000000000)
-            m,s = divmod(s, 60)
-
-            if m < 60:
-                return "%02i:%02i" %(m,s)
-            else:
-                h,m = divmod(m, 60)
-                return "%i:%02i:%02i" %(h,m,s)
+        print "hi"
+        count = 0
     
         while True:
         
-            time.sleep(0.2)
-            
-            try:
-                pos_int = self.player.query_position(gst.FORMAT_TIME, None)[0]
-                dur_int = self.player.query_duration(gst.FORMAT_TIME, None)[0]
-            except gst.QueryError:
-                continue
-            
-            gtk.gdk.threads_enter()
-            self.builder.get_object("time-label").set_text(convert_ns(pos_int) + " / " + convert_ns(dur_int))
-            self.respond_to_slider = False
-            self.builder.get_object("playback-adjustment").set_value((float(pos_int) / float(dur_int)) * 100.)
-            self.respond_to_slider = True
-            gtk.gdk.threads_leave()
+            print count
+            count += 1
+        
+            time.sleep(1.0)
+            self.update_time()
+
                         
     def on_message(self, bus, message):
         t = message.type
