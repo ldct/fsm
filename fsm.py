@@ -133,12 +133,10 @@ class GTK_Main:
         except gst.QueryError:
             return
         
-        gtk.gdk.threads_enter()
         self.builder.get_object("time-label").set_text(convert_ns(pos_int) + " / " + convert_ns(dur_int))
         self.respond_to_slider = False
         self.builder.get_object("playback-adjustment").set_value((float(pos_int) / float(dur_int)) * 100.)
         self.respond_to_slider = True
-        gtk.gdk.threads_leave()
         
     def time_cron(self):
     
@@ -151,7 +149,9 @@ class GTK_Main:
             count += 1
         
             time.sleep(1.0)
+            gtk.gdk.threads_enter()
             self.update_time()
+            gtk.gdk.threads_leave()
 
                         
     def on_message(self, bus, message):
