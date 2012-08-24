@@ -1,11 +1,7 @@
 #!/usr/bin/env python
 
 import sys, os, thread, time
-import pygtk, gtk, gobject
-import gtk.glade
-import pygst
-pygst.require("0.10")
-import gst
+import gtk, gst
 
 from constants import *
 from album_art import get_album_art

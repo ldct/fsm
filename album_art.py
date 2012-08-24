@@ -1,9 +1,5 @@
 import os
-import pygtk, gtk, gobject
-import gtk.glade
-import pygst
-pygst.require("0.10")
-import gst
+import gtk
 
 from random import randint
 
@@ -21,7 +17,6 @@ def get_album_art(d):
     return pics[randint(0,len(pics)-1)]
     
 def fill_album_art(d):
-    print "filling album art..."
     pics = []
     for root, dirs, files in os.walk(d):
         for name in files:
