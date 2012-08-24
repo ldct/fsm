@@ -4,9 +4,9 @@
   <!-- interface-naming-policy project-wide -->
   <object class="GtkListStore" id="album-store">
     <columns>
-      <!-- column-name gchararray1 -->
+      <!-- column-name label -->
       <column type="gchararray"/>
-      <!-- column-name GdkPixbuf1 -->
+      <!-- column-name album-art -->
       <column type="GdkPixbuf"/>
       <!-- column-name filepath -->
       <column type="gchararray"/>

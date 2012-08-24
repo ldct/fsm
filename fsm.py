@@ -132,6 +132,8 @@ class GTK_Main:
         s = self.builder.get_object("album-store").get(i,2)[0]
         self.builder.get_object("selected-album").set_text(s)
         
+        print s
+        
         self.builder.get_object("songs-store").clear()
         for f in list_files(s):
             self.builder.get_object("songs-store").append([f])
