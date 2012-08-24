@@ -1,24 +1,37 @@
 #!/usr/bin/env python
 
 import sys, os, thread, time
+from random import randint
 import pygtk, gtk, gobject
 import gtk.glade
 import pygst
 pygst.require("0.10")
 import gst
 
+ALBUMARTLENGTH = 100
+LINELENGTH = 12
+MAXLINES = 4
+
 def list_files(d):
     for root, dirs, files in os.walk(d):
-       for name in files:       
-           filename = os.path.join(root, name)
-           yield filename
+        for name in files:
+            ext = name[-4:]
+            if ext in [".ogg", ".mp3", "flac"]:
+                filename = os.path.join(root, name)
+                yield filename
 
-def cut(s, l):
-    return s[0:l]
-    if len(s) < l:
-        return s
-    else:
-        return s[0:l] + '\n' + cut(s[l:], l)
+def cut(s):
+    words = s.split()
+    lines = [""]
+    
+    while len(words) > 0:
+        if len(words[0]) + len(lines[-1]) < LINELENGTH:
+            lines[-1] = lines[-1] + " " + words[0]
+            words = words[1:]
+        else:
+            lines.append(words[0][:LINELENGTH])
+            words[0] = words[0][LINELENGTH:]
+    return '\n'.join([l for l in lines if l != ""][:MAXLINES])
         
 def convert_ns(t):
     s,ns = divmod(t, 1000000000)
@@ -29,6 +42,20 @@ def convert_ns(t):
     else:
         h,m = divmod(m, 60)
         return "%i:%02i:%02i" %(h,m,s)
+        
+        
+def get_album_art(d):
+    pics = []
+    for root, dirs, files in os.walk(d):
+        for name in files:
+            if name[-3:] == "jpg" or name[-4:] == "jpeg":
+                fullpath = os.path.join(root, name)
+                pics.append(gtk.gdk.pixbuf_new_from_file(fullpath).scale_simple(ALBUMARTLENGTH,ALBUMARTLENGTH,gtk.gdk.INTERP_BILINEAR))
+    if len(pics) > 0:
+        return pics[randint(0,len(pics)-1)]
+    else:
+        return gtk.gdk.pixbuf_new_from_file("/home/xuanji/fsm/Octavarium.jpg").scale_simple(ALBUMARTLENGTH,ALBUMARTLENGTH,gtk.gdk.INTERP_BILINEAR)
+    
 
 class GTK_Main:
 
@@ -69,11 +96,10 @@ class GTK_Main:
         self.builder.get_object("album-store").clear()
         for fl in os.listdir(self.music_directory):
             self.builder.get_object("songs-store").append([fl])
-            if not fl[0] == '.': 
-                if os.path.isdir(os.path.join("/home/xuanji/Music", fl)):
-                    self.builder.get_object("album-store").append([cut(fl,10),self.bn_image, os.path.join("/home/xuanji/Music", fl)])
-                else:
-                    self.builder.get_object("album-store").append([cut(fl,10),self.an_image, os.path.join("/home/xuanji/Music", fl)])
+            if not fl[0] == '.':
+                fullpath = os.path.join(self.music_directory, fl)
+                if os.path.isdir(fullpath):
+                    self.builder.get_object("album-store").append([cut(fl),get_album_art(fullpath), fullpath])
 
     def load_new_file(self, filepath):
         if os.path.isfile(filepath):
@@ -104,7 +130,7 @@ class GTK_Main:
     def album_view_item_activated_callback(self, w, path):
         i = self.builder.get_object("album-store").get_iter(path)
         s = self.builder.get_object("album-store").get(i,2)[0]
-        self.builder.get_object("entry").set_text(s)
+        self.builder.get_object("selected-album").set_text(s)
         
         self.builder.get_object("songs-store").clear()
         for f in list_files(s):
@@ -114,7 +140,6 @@ class GTK_Main:
     
         i = self.builder.get_object("songs-store").get_iter(path)
         s = self.builder.get_object("songs-store").get(i,0)[0]
-        self.builder.get_object("entry").set_text(s)
 
         self.load_new_file(s)
         self.builder.get_object("play_pause_toggle").set_active(True)
