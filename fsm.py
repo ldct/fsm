@@ -1,16 +1,14 @@
 #!/usr/bin/env python
 
 import sys, os, thread, time
-from random import randint
 import pygtk, gtk, gobject
 import gtk.glade
 import pygst
 pygst.require("0.10")
 import gst
 
-ALBUMARTLENGTH = 100
-LINELENGTH = 12
-MAXLINES = 4
+from constants import *
+from album_art import get_album_art
 
 def list_files(d):
     for root, dirs, files in os.walk(d):
@@ -41,26 +39,13 @@ def convert_ns(t):
         return "%02i:%02i" %(m,s)
     else:
         h,m = divmod(m, 60)
-        return "%i:%02i:%02i" %(h,m,s)
-        
-        
-def get_album_art(d):
-    pics = []
-    for root, dirs, files in os.walk(d):
-        for name in files:
-            if name[-3:] == "jpg" or name[-4:] == "jpeg":
-                fullpath = os.path.join(root, name)
-                pics.append(gtk.gdk.pixbuf_new_from_file(fullpath).scale_simple(ALBUMARTLENGTH,ALBUMARTLENGTH,gtk.gdk.INTERP_BILINEAR))
-    if len(pics) > 0:
-        return pics[randint(0,len(pics)-1)]
-    else:
-        return gtk.gdk.pixbuf_new_from_file("/home/xuanji/fsm/Octavarium.jpg").scale_simple(ALBUMARTLENGTH,ALBUMARTLENGTH,gtk.gdk.INTERP_BILINEAR)
-    
+        return "%i:%02i:%02i" %(h,m,s) 
 
 class GTK_Main:
 
     music_directory = "/home/xuanji/Music"
     builder = gtk.Builder()
+    album_art = {}
     
     def __init__(self):
         
@@ -91,6 +76,7 @@ class GTK_Main:
     def get_icon(self, name):
         theme = gtk.icon_theme_get_default()
         return theme.load_icon(name, 48, 0)
+        
         
     def fill_store(self):
         self.builder.get_object("album-store").clear()
@@ -133,6 +119,8 @@ class GTK_Main:
         self.builder.get_object("selected-album").set_text(s)
         
         print s
+        
+        self.builder.get_object("album-store").set(i,1,get_album_art(s))
         
         self.builder.get_object("songs-store").clear()
         for f in list_files(s):
