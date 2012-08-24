@@ -7,14 +7,19 @@ from constants import *
 
 album_art = {}
 
-def get_album_art(d):
+def choose(a,dnr):
+    if len(a) == 1:
+        return a[0]
+    else:
+        r = [p for p in a if not (p == dnr)]
+        return r[randint(0,len(r)-1)]
+
+def get_album_art(d,dnr = None):
     print "getting album art..."
     if not (d in album_art.keys()):
         fill_album_art(d)            
         
-    pics = album_art[d]
-    
-    return pics[randint(0,len(pics)-1)]
+    return choose(album_art[d],dnr)
     
 def fill_album_art(d):
     pics = []

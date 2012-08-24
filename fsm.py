@@ -96,10 +96,8 @@ class GTK_Main:
             self.player.set_state(gst.STATE_PAUSED)
         self.update_time()
 
-            
     def rewind_callback(self, w):
         pos_int = self.player.query_position(gst.FORMAT_TIME, None)[0]
-        dur_int = self.player.query_duration(gst.FORMAT_TIME, None)[0]
         seek_ns = pos_int - (10 * 1000000000)
         self.player.seek_simple(gst.FORMAT_TIME, gst.SEEK_FLAG_FLUSH, seek_ns)
         
@@ -112,11 +110,12 @@ class GTK_Main:
     def album_view_item_activated_callback(self, w, path):
         i = self.builder.get_object("album-store").get_iter(path)
         s = self.builder.get_object("album-store").get(i,2)[0]
+        p = self.builder.get_object("album-store").get(i,1)[0]
         self.builder.get_object("selected-album").set_text(s)
         
-        print s
+        print "album selected - " +s
         
-        self.builder.get_object("album-store").set(i,1,get_album_art(s))
+        self.builder.get_object("album-store").set(i,1,get_album_art(s,p))
         
         self.builder.get_object("songs-store").clear()
         for f in list_files(s):
