@@ -24,7 +24,7 @@ fsm is written in python and uses the GTK toolkit for its gui and the GStreamer 
 Why?
 ----
 
-Many music players assume that songs should be grouped together according to albums and that the same album will have the same artists. While this might be fine for most music it fails quite badly for audio files that don't fit into this mold. Use cases include
+Many music players assume that songs should be grouped together according to albums and that the same album will have the same artists. While this might be fine for most music it fails quite badly for audio files that don't fit into this mould. Use cases include
 
 - Compilation albums
 - Songs where the artist field lists individual band members involved
