@@ -10,7 +10,7 @@ Every thumbnail in the above screenshot corresponds to a folder in the music dir
 Installation
 ------------
 
-Clone this repository, cd into it and run 
+Clone this repository, ```cd``` into it and run 
 
 ```python ./fsm.py```
 
