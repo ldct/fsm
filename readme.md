@@ -32,7 +32,7 @@ Many music players assume that songs should be grouped together according to alb
 - Files with broken metadata - "Unknown Artist"
 - Individual ~~downloads~~ purchases which result in singleton album entries
 
-While there are workarounds for the above problems at some point one wonders if the album/artist categorization was really worth that much trouble. Hence fsm was born.
+While there are workarounds for the above problems at some point one wonders if the album/artist categorization was really worth that much trouble; hence was fsm born. Another advantage is that you can control exactly how you want your music to be grouped and displayed by moving the underlying files around. As an example in the above screenshot I have a folder of songs by a single artist (Paul Okenfold), a discography folder (Symphony X), as well as more traditional albums.
 
 Known Bugs
 ----------
