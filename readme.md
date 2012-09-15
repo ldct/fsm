@@ -26,11 +26,11 @@ Why?
 
 Many music players assume that songs should be grouped together according to albums and that the same album will have the same artists. While this might be fine for most music it fails quite badly for audio files that don't fit into this mold. Use cases include
 
--Compilation albums
--Songs where the artist field lists individual band members involved
--Classical music
--Files with broken metadata - "Unknown Artist"
--Individual ~~downloads~~ purchases which result in singleton album entries
+- Compilation albums
+- Songs where the artist field lists individual band members involved
+- Classical music
+- Files with broken metadata - "Unknown Artist"
+- Individual ~~downloads~~ purchases which result in singleton album entries
 
 While there are workarounds for the above problems at some point one wonders if the album/artist categorization was really worth that much trouble. Hence fsm was born.
 
