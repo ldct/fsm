@@ -9,4 +9,5 @@ fsm is written in python and uses the GTK toolkit for its gui and the GStreamer 
 
 known bugs: reproccesses all album art on startup, which takse a very long time
 
-![screenshot](zodiac.github.com/fsm/screenshot.jpg)
+![screenshot](https://raw.github.com/zodiac/fsm/master/screenshot.jpg)
+
