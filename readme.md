@@ -1,7 +1,7 @@
 Filesystem Music Player
 =======================
 
-fsm organizes your music by folders instead of the usual jumble of albums, artists etc. Perfect for people (like me!) whose music does not naturally follow the album/artist organization that most music players rely on. Also takes album art from associated folder.
+fsm organizes your music by the folders the audio files actually reside in on disk instead of the usual jumble of albums, artists etc. Perfect for people (like me!) whose music does not naturally follow the album/artist organization that most music players rely on. Also takes album art from associated folder.
 
 ![screenshot](https://raw.github.com/zodiac/fsm/master/screenshot.jpg)
 
@@ -20,6 +20,19 @@ Requirements
 ------------
 
 fsm is written in python and uses the GTK toolkit for its gui and the GStreamer python bindings for audio playback. If your python can successfully import the gtk and gst modules it should work. fsm was developed and tested on linux and should work on windows; if you do manage to get it to work (or encounter problems), please tell me!
+
+Why?
+----
+
+Many music players assume that songs should be grouped together according to albums and that the same album will have the same artists. While this might be fine for most music it fails quite badly for audio files that don't fit into this mold. Use cases include
+
+-Compilation albums
+-Songs where the artist field lists individual band members involved
+-Classical music
+-Files with broken metadata - "Unknown Artist"
+-Individual ~~downloads~~ purchases which result in singleton album entries
+
+While there are workarounds for the above problems at some point one wonders if the album/artist categorization was really worth that much trouble. Hence fsm was born.
 
 Known Bugs
 ----------
