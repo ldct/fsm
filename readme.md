@@ -1,7 +1,7 @@
 Filesystem Music Player
 =======================
 
-![screenshot](https://raw.github.com/zodiac/fsm/master/screenshot.jpg)
+![screenshot](screenshot.jpg)
 
 fsm organizes your music by folders instead of the usual jumble of albums, artists etc. Perfect for people (like me!) whose music does not naturally follow the album/artist organization that most music players rely on. Also takes album art from associated folder.
 
