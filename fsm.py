@@ -76,12 +76,11 @@ class GTK_Main:
         
     def fill_store(self):
         self.builder.get_object("album-store").clear()
-        for fl in os.listdir(self.music_directory):
-            self.builder.get_object("songs-store").append([fl])
-            if not fl[0] == '.':
-                fullpath = os.path.join(self.music_directory, fl)
+        for filename in os.listdir(self.music_directory):
+            if not filename[0] == '.':
+                fullpath = os.path.join(self.music_directory, filename)
                 if os.path.isdir(fullpath):
-                    self.builder.get_object("album-store").append([cut(fl),get_album_art(fullpath), fullpath])
+                    self.builder.get_object("album-store").append([cut(filename),get_album_art(fullpath), fullpath])
 
     def load_new_file(self, filepath):
         if os.path.isfile(filepath):
