@@ -22,7 +22,7 @@ def get_album_art(d,dnr = None):
     return choose(album_art[d],dnr)
     
     
-QUICK = 1
+QUICK = 0
 def fill_album_art(d):
     pics = []
     for root, dirs, files in os.walk(d):
