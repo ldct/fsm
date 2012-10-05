@@ -106,8 +106,7 @@ class GTK_Main:
         seek_ns = pos_int + (10 * 1000000000)
         self.player.seek_simple(gst.FORMAT_TIME, gst.SEEK_FLAG_FLUSH, seek_ns)
         
-    def album_view_item_activated_callback(self, w, path):
-        i = self.builder.get_object("album-store").get_iter(path)
+    def set_album(self, i):
         s = self.builder.get_object("album-store").get(i,2)[0]
         p = self.builder.get_object("album-store").get(i,1)[0]
         self.builder.get_object("selected-album").set_text(s)
@@ -119,15 +118,34 @@ class GTK_Main:
         self.builder.get_object("songs-store").clear()
         for f in list_files(s):
             self.builder.get_object("songs-store").append([f])
-            
-    def song_view_row_activated_callback(self, treeview, path, view_column):
+        
+    def album_view_item_activated_callback(self, w, path):
+        i = self.builder.get_object("album-store").get_iter(path)
+        self.set_album(i)
+        self.album_iter = i
     
-        i = self.builder.get_object("songs-store").get_iter(path)
+    def set_song(self, i):
         s = self.builder.get_object("songs-store").get(i,0)[0]
 
         self.load_new_file(s)
         self.builder.get_object("play_pause_toggle").set_active(True)
-
+    
+    def song_view_row_activated_callback(self, treeview, path, view_column):
+    
+        i = self.builder.get_object("songs-store").get_iter(path)
+        self.set_song(i)
+        self.song_iter = i
+        
+    def next_callback(self, w):
+        #self.set_album(self.album_iter
+        p = self.builder.get_object("songs-store").get_path(self.song_iter)
+        p = (p[0] + 1,)
+        
+        i = self.builder.get_object("songs-store").get_iter(p)
+        self.set_song(i)
+        self.song_iter = i
+        
+        
         
     def playback_callback(self, w):
         if self.respond_to_slider:

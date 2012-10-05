@@ -21,13 +21,16 @@ def get_album_art(d,dnr = None):
         
     return choose(album_art[d],dnr)
     
+    
+QUICK = 1
 def fill_album_art(d):
     pics = []
     for root, dirs, files in os.walk(d):
+        if QUICK == 1: break
         for name in files:
             if name[-3:] == "jpg" or name[-4:] == "jpeg":
                 fullpath = os.path.join(root, name)
-                pics.append(gtk.gdk.pixbuf_new_from_file(fullpath).scale_simple(ALBUMARTLENGTH,ALBUMARTLENGTH,gtk.gdk.INTERP_BILINEAR))
+                pics.append(gtk.gdk.pixbuf_new_from_file(fullpath).scale_simple(ALBUMARTLENGTH,ALBUMARTLENGTH,gtk.gdk.INTERP_BILINEAR))            
     
     if len(pics) == 0:
         pics = [gtk.gdk.pixbuf_new_from_file("/home/xuanji/fsm/Octavarium.jpg").scale_simple(ALBUMARTLENGTH,ALBUMARTLENGTH,gtk.gdk.INTERP_BILINEAR)]
